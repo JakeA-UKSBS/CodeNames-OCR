@@ -42,7 +42,16 @@
   .swatch.red { background: #c4473a; }
   .swatch.blue { background: #2e6db0; }
   .swatch.black { background: #0b0b0b; border-color: #555; }
+  .swatch.white { background: #e9dfc8; }
+  .swatch.done { background: #e9dfc8; color: #d22; font: 900 2rem/1 Arial, sans-serif; }
   .swatch.on { border-color: #ecebe2; box-shadow: 0 0 0 3px #ecebe2; }
+  .card { position: relative; }
+  .card.done::before, .card.done::after {
+    content: ""; position: absolute; left: 50%; top: 50%; width: 85%; height: 8px;
+    background: #e02020; border-radius: 4px; pointer-events: none; box-shadow: 0 0 0 2px #fff;
+    transform: translate(-50%, -50%) rotate(28deg);
+  }
+  .card.done::after { transform: translate(-50%, -50%) rotate(-28deg); }
   #notesBtn { margin-left: auto; }
   #notes {
     position: fixed; top: 0; right: 0; bottom: 0; width: min(360px, 90vw);
@@ -69,6 +78,8 @@
   <button class="swatch red" data-colour="red" aria-label="Red"></button>
   <button class="swatch blue" data-colour="blue" aria-label="Blue"></button>
   <button class="swatch black" data-colour="black" aria-label="Black"></button>
+  <button class="swatch white" data-colour="white" aria-label="Back to default"></button>
+  <button class="swatch done" data-colour="done" aria-label="Cross out">✕</button>
   <button class="btn ghost" id="notesBtn">Notes</button>
 </header>
 <main id="board"></main>
@@ -100,6 +111,8 @@ function show(words) {
     c.addEventListener("pointerdown", ev => {
       if (!colour) return;
       ev.preventDefault();
+      if (colour === "done") { c.classList.toggle("done"); return; }      // red cross on/off
+      if (colour === "white") { c.classList.remove("red", "blue", "black", "done"); return; }  // back to default
       const had = c.classList.contains(colour);
       c.classList.remove("red", "blue", "black");
       if (!had) c.classList.add(colour);

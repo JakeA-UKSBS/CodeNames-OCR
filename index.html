@@ -43,6 +43,21 @@
   .swatch.blue { background: #2e6db0; }
   .swatch.black { background: #0b0b0b; border-color: #555; }
   .swatch.on { border-color: #ecebe2; box-shadow: 0 0 0 3px #ecebe2; }
+  #notesBtn { margin-left: auto; }
+  #notes {
+    position: fixed; top: 0; right: 0; bottom: 0; width: min(360px, 90vw);
+    background: #0d1611; border-left: 2px solid #2a3a30; padding: 16px;
+    box-sizing: border-box; display: flex; flex-direction: column; gap: 10px;
+    transform: translateX(100%); transition: transform .2s; z-index: 5;
+  }
+  #notes.open { transform: none; }
+  #notes .top { display: flex; align-items: center; gap: 10px; }
+  #notes h2 { margin: 0; font-size: 1.3rem; text-transform: uppercase; letter-spacing: .05em; flex: 1; }
+  #notes .btn { padding: 10px 14px; font-size: .95rem; }
+  #clues {
+    flex: 1; resize: none; border-radius: 8px; border: 2px solid #2a3a30; padding: 12px;
+    background: #142019; color: #ecebe2; font-family: inherit; font-size: 1.3rem; line-height: 1.4;
+  }
 </style>
 </head>
 <body>
@@ -54,8 +69,17 @@
   <button class="swatch red" data-colour="red" aria-label="Red"></button>
   <button class="swatch blue" data-colour="blue" aria-label="Blue"></button>
   <button class="swatch black" data-colour="black" aria-label="Black"></button>
+  <button class="btn ghost" id="notesBtn">Notes</button>
 </header>
 <main id="board"></main>
+<aside id="notes" aria-label="Notes">
+  <div class="top">
+    <h2>Clues</h2>
+    <button class="btn ghost" id="clearClues">Clear</button>
+    <button class="btn" id="closeNotes">Close</button>
+  </div>
+  <textarea id="clues" placeholder="What do you want to say?"></textarea>
+</aside>
 
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js"></script>
 <script>
@@ -201,6 +225,12 @@ document.getElementById("photo").addEventListener("change", async e => {
 });
 
 document.getElementById("clearBtn").addEventListener("click", () => show([]));
+
+// Notes popout
+const notes = document.getElementById("notes");
+document.getElementById("notesBtn").addEventListener("click", () => notes.classList.toggle("open"));
+document.getElementById("closeNotes").addEventListener("click", () => notes.classList.remove("open"));
+document.getElementById("clearClues").addEventListener("click", () => { document.getElementById("clues").value = ""; });
 
 // Colour picker: tap a swatch to select it, tap it again to go back to editing words
 let colour = null;

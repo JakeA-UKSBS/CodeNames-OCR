@@ -12,7 +12,7 @@
     display: flex; flex-direction: column; gap: 12px;
     padding: 12px 16px; box-sizing: border-box;
   }
-  header { display: flex; gap: 12px; }
+  header { display: flex; flex-wrap: wrap; gap: 12px; }
   .btn {
     font: 700 1.1rem/1 inherit; font-family: inherit; text-transform: uppercase; letter-spacing: .05em;
     padding: 14px 20px; border-radius: 8px; cursor: pointer; border: 2px solid #ecebe2;
@@ -35,6 +35,14 @@
     outline: none;
   }
   .card:focus { box-shadow: 0 0 0 3px #8fa596; }
+  .card.red { background: #c4473a; color: #fff; }
+  .card.blue { background: #2e6db0; color: #fff; }
+  .card.black { background: #0b0b0b; color: #fff; box-shadow: inset 0 0 0 2px #555; }
+  .swatch { width: 52px; padding: 0; border: 3px solid transparent; border-radius: 8px; cursor: pointer; }
+  .swatch.red { background: #c4473a; }
+  .swatch.blue { background: #2e6db0; }
+  .swatch.black { background: #0b0b0b; border-color: #555; }
+  .swatch.on { border-color: #ecebe2; box-shadow: 0 0 0 3px #ecebe2; }
 </style>
 </head>
 <body>
@@ -43,6 +51,9 @@
     <input type="file" id="photo" accept="image/*">
   </label>
   <button class="btn ghost" id="clearBtn">Clear</button>
+  <button class="swatch red" data-colour="red" aria-label="Red"></button>
+  <button class="swatch blue" data-colour="blue" aria-label="Blue"></button>
+  <button class="swatch black" data-colour="black" aria-label="Black"></button>
 </header>
 <main id="board"></main>
 
@@ -58,8 +69,17 @@ function show(words) {
     const c = document.createElement("div");
     c.className = "card";
     c.textContent = words[i] || "";
+    if ((words[i] || "").length > 7) c.style.fontSize = "clamp(.8rem, 2.1vw, 1.7rem)";  // fit long words on one line
     c.contentEditable = "true";   // tap a card to fix or fill in a word
     c.spellcheck = false;
+    // With a colour selected, tapping paints the card (tap again to remove)
+    c.addEventListener("pointerdown", ev => {
+      if (!colour) return;
+      ev.preventDefault();
+      const had = c.classList.contains(colour);
+      c.classList.remove("red", "blue", "black");
+      if (!had) c.classList.add(colour);
+    });
     board.appendChild(c);
   }
 }
@@ -181,6 +201,15 @@ document.getElementById("photo").addEventListener("change", async e => {
 });
 
 document.getElementById("clearBtn").addEventListener("click", () => show([]));
+
+// Colour picker: tap a swatch to select it, tap it again to go back to editing words
+let colour = null;
+const swatches = document.querySelectorAll(".swatch");
+swatches.forEach(s => s.addEventListener("click", () => {
+  colour = colour === s.dataset.colour ? null : s.dataset.colour;
+  swatches.forEach(x => x.classList.toggle("on", x.dataset.colour === colour));
+  document.activeElement?.blur();
+}));
 
 show([]);
 </script>
